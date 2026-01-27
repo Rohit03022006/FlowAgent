@@ -1,12 +1,9 @@
 "use client";
 import React, { useCallback, useEffect, useState } from 'react'
 import Header from '../_components/Header'
-import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, MiniMap, Controls, Panel } from '@xyflow/react';
+import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, MiniMap, Controls, Panel, useOnSelectionChange, OnSelectionChangeParams } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import StartNode from '../_customNode/StartNode';
-import AgentNode from '../_customNode/AgentNode';
-import EndNode from '../_customNode/EndNode';
-import IfElseLoop from '../_customNode/IfElseLoop';
+import { nodeTypes } from '../_constants/nodeTypes';
 import AgentToolPanel from '../_components/AgentToolPanel';
 import { WorkFlowContext } from '@/context/WorkFlowContext';
 import { useContext } from 'react';
@@ -18,22 +15,11 @@ import { Id } from '../../../../convex/_generated/dataModel';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 import { toast } from 'sonner';
-import WhileLoop from '../_customNode/WhileLoop';
-import UserApproval from '../_customNode/UserApprovalNode';
-import ApiNode from '../_customNode/ApiNode';
+import SettingPanel from '../_components/SettingPanel';
+
 
 const AgentBuilder = () => {
-
-  const nodeTypes = {
-    StartNode: StartNode,
-    AgentNode: AgentNode,
-    EndNode: EndNode,
-    IfElseLoop: IfElseLoop,
-    WhileLoop: WhileLoop,
-    UserApproval: UserApproval,
-    ApiNode: ApiNode,
-  };
-  const { addedNodes, setAddedNodes, nodeEdges, setNodeEdges } = useContext(WorkFlowContext);
+  const { addedNodes, setAddedNodes, nodeEdges, setNodeEdges, selectedNodes, setSelectedNodes } = useContext(WorkFlowContext);
 
   const convex = useConvex();
   const UpdateAgentDetails = useMutation(api.agent.UpdateAgentDetails);
@@ -101,6 +87,15 @@ const AgentBuilder = () => {
     [setNodeEdges],
   );
 
+  const onNodeSelect = useCallback(({ nodes, edges }: OnSelectionChangeParams) => {
+    setSelectedNodes(nodes[0]);
+    console.log(nodes[0]);
+  }, []);
+
+
+  useOnSelectionChange({
+    onChange: onNodeSelect
+  });
 
 
   return (
@@ -124,7 +119,7 @@ const AgentBuilder = () => {
             <AgentToolPanel />
           </Panel>
           <Panel position="top-right">
-            Settings
+            <SettingPanel />
           </Panel>
 
           <Panel position="bottom-center">

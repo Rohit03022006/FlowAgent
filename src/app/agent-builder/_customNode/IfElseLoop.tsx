@@ -16,9 +16,15 @@ export default function IfElseLoop({ data }: any) {
       </div>
 
       <div className="mt-1 max-w-[140px] flex flex-col gap-0.5">
-        <Input placeholder="If condition" className="h-6 text-[10px] px-2" disabled />
-        <Input placeholder="Else condition" className="h-6 text-[10px] px-2" disabled />
+        <Input
+          placeholder="If condition"
+          className="h-6 text-[10px] px-2"
+          disabled
+          value={data?.setting?.condition || ""}
+        />
+        <div className="text-[8px] text-gray-400 px-2 italic">Else: automatic</div>
       </div>
+
 
       <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 bg-blue-500 border border-white" />
 

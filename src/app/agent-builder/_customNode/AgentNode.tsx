@@ -13,6 +13,7 @@ export default function AgentNode({ data }: any) {
                     <MousePointerClick className="h-4 w-4 text-gray-700" />
                 </div>
                 <div className="flex flex-col">
+                    <h2 className='text-xs text-muted-foreground'>Agent</h2>
                     <h2 className="text-sm font-medium text-gray-900">{data?.label || 'Agent'}</h2>
                 </div>
                 <Handle type="source" position={Position.Right} className="w-3 h-3 bg-blue-500 border-2 border-white" />

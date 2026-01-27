@@ -23,6 +23,7 @@ import {
   WalletCards,
   User2Icon,
   Gem,
+  Zap,
 } from "lucide-react";
 
 import Image from "next/image";
@@ -49,7 +50,9 @@ const AppSideBar = () => {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <Link href="/" className="flex items-center gap-1">
-          <Image src="/logo.svg" alt="Logo" width={30} height={30} />
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <Zap className="w-5 h-5 text-primary-foreground fill-primary-foreground" />
+          </div>
           {open && (
             <h2 className="px-2 text-lg font-extrabold tracking-tight">
               FlowAgent
@@ -66,8 +69,8 @@ const AppSideBar = () => {
             <SidebarMenu>
               {menuItems.map((menu) => (
                 <SidebarMenuItem key={menu.label}>
-                  <SidebarMenuButton asChild size="lg" isActive={path === menu.url? true : false}>  
-                
+                  <SidebarMenuButton asChild size="lg" isActive={path === menu.url ? true : false}>
+
                     <Link href={menu.url} className="flex items-center">
                       <menu.icon className={`h-5 w-5 ${open ? "mr-3" : ""}`} />
                       {open && <span>{menu.label}</span>}

@@ -12,4 +12,5 @@ export type Agent = {
   userId: Id<"UserTable">;
   createdAt: number;
   updatedAt?: number;
+  agentToolConfig?: any;
 }

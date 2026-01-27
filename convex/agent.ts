@@ -48,13 +48,36 @@ export const UpdateAgentDetails = mutation({
         name: v.optional(v.string()),
         nodes: v.optional(v.any()),
         edges: v.optional(v.any()),
+        agentToolConfig: v.optional(v.any()),
     },
     handler: async (ctx, args) => {
         await ctx.db.patch(args.agentId, {
             ...(args.name !== undefined && { name: args.name }),
             ...(args.nodes !== undefined && { nodes: args.nodes }),
             ...(args.edges !== undefined && { edges: args.edges }),
+            ...(args.agentToolConfig !== undefined && { agentToolConfig: args.agentToolConfig }),
             updatedAt: Date.now(),
         });
+    },
+});
+
+export const UpdateAgentToolConfig = mutation({
+    args: {
+        agentId: v.id("AgentTable"),
+        agentToolConfig: v.any(),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.agentId, {
+            agentToolConfig: args.agentToolConfig,
+        });
+    },
+});
+
+export const DeleteAgent = mutation({
+    args: {
+        agentId: v.id("AgentTable"),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.agentId);
     },
 });

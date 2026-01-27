@@ -14,14 +14,15 @@ export default function UserApproval({ data }: any) {
 
         <div className="flex flex-col leading-tight">
           <span className="text-xs font-medium text-gray-900">
-           User Approval
+            User Approval
           </span>
         </div>
       </div>
 
-      <div className="mt-1 text-[10px] text-gray-500">
-        Requires user confirmation
+      <div className="mt-1 text-[10px] text-gray-500 italic px-0.5 line-clamp-2">
+        {data?.setting?.message || "Requires user confirmation"}
       </div>
+
 
       <div className="mt-1 flex flex-col gap-0.5 nodrag">
         <Button variant="outline" className="h-6 text-[10px] px-2" disabled >
@@ -34,7 +35,7 @@ export default function UserApproval({ data }: any) {
 
       <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 bg-blue-500 border border-white" />
 
-      <Handle type="source" position={Position.Right} id="approved" className="w-2.5 h-2.5 bg-green-500 border border-white"  style={{ top: 67 }} />
+      <Handle type="source" position={Position.Right} id="approved" className="w-2.5 h-2.5 bg-green-500 border border-white" style={{ top: 67 }} />
 
       <Handle type="source" position={Position.Right} id="rejected" className="w-2.5 h-2.5 bg-red-500 border border-white" style={{ top: 92 }} />
     </div>
@@ -42,4 +43,3 @@ export default function UserApproval({ data }: any) {
 };
 
 
- 

@@ -17,8 +17,14 @@ const WhileLoop = ({ data }: any) => {
       </div>
 
       <div className="mt-1">
-        <Input placeholder="Condition" className="h-6 text-[10px] px-2" disabled />
+        <Input
+          placeholder="Condition"
+          className="h-6 text-[10px] px-2"
+          disabled
+          value={data?.setting?.condition || ""}
+        />
       </div>
+
 
       <Handle type="target" position={Position.Left} id="input" className="w-2.5 h-2.5 bg-blue-500 border border-white" />
 
