@@ -23,12 +23,12 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-white mb-4 italic">3. Use of AI Services</h2>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-4 italic">3. Use of AI Services</h2>
                     <p>FlowAgent interacts with third-party AI providers like OpenAI and Google Gemini. When you run an agent, parts of your workflow configuration and chat inputs may be sent to these providers to generate responses. We do not use your private data to train our own models.</p>
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-white mb-4 italic">4. Security</h2>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-4 italic">4. Security</h2>
                     <p>We implement industry-standard security measures to protect your data. All communication is encrypted via SSL/TLS, and sensitive configuration data is strictly controlled.</p>
                 </section>
             </div>

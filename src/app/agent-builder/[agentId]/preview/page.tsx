@@ -18,10 +18,24 @@ export default function PreviewPage() {
     const { agentId } = useParams();
     const [loading, setLoading] = useState(false);
     const [config, setConfig] = useState<any>();
+    const convex = useConvex();
+    const [agentDetails, setAgentDetails] = useState<any>();
+    const [conversationId, setConversationId] = useState<string>("");
 
-    const agentDetails = useQuery(api.agent.GetAgentById, {
-        agentId: agentId as Id<"AgentTable">
-    });
+    const GetAgentDetails = async () => {
+        const result = await convex.query(api.agent.GetAgentById, {
+            agentId: agentId as Id<"AgentTable">
+        });
+        setAgentDetails(result);
+
+        // get conversation id of not present create new one
+        const conversationIdResult = await axios.get("/api/agent-chat");
+        console.log("Conversation Id Result:", conversationIdResult);
+    }
+
+    useEffect(() => {
+        GetAgentDetails();
+    }, []);
 
     const updateAgentToolConfig = useMutation(api.agent.UpdateAgentToolConfig);
 

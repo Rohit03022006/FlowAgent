@@ -1,23 +1,20 @@
 import arcjet, { detectBot, shield, tokenBucket } from "@arcjet/next";
 
+const isDev = process.env.NODE_ENV === "development";
+
 export const aj = arcjet({
   key: process.env.ARCJET_KEY!, // Get your site key from https://app.arcjet.com
   rules: [
-   
-    shield({ mode: "LIVE" }),
-   
+    shield({ mode: isDev ? "DRY_RUN" : "LIVE" }),
     detectBot({
-      mode: "LIVE", 
-      allow: [
-        "CATEGORY:SEARCH_ENGINE", 
-     
-      ],
+      mode: isDev ? "DRY_RUN" : "LIVE",
+      allow: ["CATEGORY:SEARCH_ENGINE"],
     }),
     tokenBucket({
-      mode: "LIVE",
+      mode: isDev ? "DRY_RUN" : "LIVE",
       refillRate: 5000,
-      interval: 30*24*60*60*100, // Refill every 1 month
-      capacity: 5000, // Bucket capacity of 10 tokens
+      interval: 30 * 24 * 60 * 60, // Refill every 30 days (1 month)
+      capacity: 5000,
     }),
   ],
 });

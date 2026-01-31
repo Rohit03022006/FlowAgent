@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { RefreshCw, Send, Bot, User, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { RefreshCw, Send, Bot, User, Sparkles, ShieldCheck, Zap, Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Prop = {
@@ -25,7 +25,8 @@ export default function ChatUi({ GenerateAgentToolConfig, loading, agentDetails 
       timestamp: new Date()
     }
   ]);
-  const [input, setInput] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState(false);
+  const [userInput, setUserInput] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom
@@ -35,29 +36,71 @@ export default function ChatUi({ GenerateAgentToolConfig, loading, agentDetails 
     }
   }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim() || loading) return;
+  const handleSend = async () => {
+    if (!userInput.trim()) return;
 
-    const userMsg: Message = {
+    const userMessage: Message = {
       role: 'user',
-      content: input,
+      content: userInput,
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
+    setMessages(prev => [...prev, userMessage]);
+    const inputToSend = userInput;
+    setUserInput('');
+    setLoadingMessage(true);
 
-    // Simulate agent thinking and responding based on workflow
-    setTimeout(() => {
-      const botMsg: Message = {
+    try {
+      const response = await fetch("/api/agent-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          agentName: agentDetails?.name,
+          agentDetails: agentDetails?.config?.agent || [],
+          input: inputToSend,
+          conversationId: ""
+        })
+      });
+
+      if (!response.body) return;
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+
+      // Add a placeholder assistant message that we will stream into
+      setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `As an agent powered by your custom workflow, I've analyzed your request: "${input}". 
-                
-I'm ready to execute the nodes you've defined to fulfill this task.`,
+        content: '',
         timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botMsg]);
-    }, 800);
+      }]);
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          setMessages(prev => {
+            const last = prev[prev.length - 1];
+            if (last && last.role === 'assistant') {
+              const updated = [...prev];
+              updated[updated.length - 1] = {
+                ...last,
+                content: last.content + chunk
+              };
+              return updated;
+            }
+            return prev;
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setLoadingMessage(false);
+    }
   };
 
   return (
@@ -70,7 +113,7 @@ I'm ready to execute the nodes you've defined to fulfill this task.`,
           </div>
           <div>
             <h3 className="text-sm font-bold text-slate-900 leading-tight flex items-center gap-1.5">
-              {agentDetails?.name || "Agent Preview"}
+              {agentDetails?.name || "Agent Name"}
               <div className="p-0.5 bg-blue-50 rounded">
                 <Zap className="w-3 h-3 text-blue-500 fill-blue-500" />
               </div>
@@ -105,16 +148,16 @@ I'm ready to execute the nodes you've defined to fulfill this task.`,
           {messages.map((msg, index) => (
             <div key={index} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm border ${msg.role === 'user'
-                  ? 'bg-slate-900 border-slate-800 text-white'
-                  : 'bg-white border-slate-200 text-blue-600'
+                ? 'bg-slate-900 border-slate-800 text-white'
+                : 'bg-white border-slate-200 text-blue-600'
                 }`}>
                 {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
               </div>
 
               <div className={`flex flex-col space-y-1 max-w-[85%] ${msg.role === 'user' ? 'items-end' : ''}`}>
                 <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === 'user'
-                    ? 'bg-blue-600 text-white rounded-tr-none'
-                    : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none'
+                  ? 'bg-blue-600 text-white rounded-tr-none'
+                  : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none'
                   }`}>
                   {msg.content}
                 </div>
@@ -136,8 +179,8 @@ I'm ready to execute the nodes you've defined to fulfill this task.`,
           </div>
           <Input
             type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Message your agent..."
             className="pl-11 pr-14 py-6 bg-slate-50 border-slate-200 rounded-2xl text-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:bg-white transition-all shadow-inner border-none"
@@ -146,10 +189,11 @@ I'm ready to execute the nodes you've defined to fulfill this task.`,
             <Button
               size="icon"
               onClick={handleSend}
-              disabled={!input.trim() || loading}
+              disabled={!userInput.trim() || loading}
               className="h-10 w-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-100 transition-all hover:scale-105 active:scale-95"
             >
-              <Send className="w-4 h-4" />
+              {loadingMessage && <Loader2 className="w-4 h-4 animate-spin" />}
+              {!loadingMessage && <Send className="w-4 h-4" />}
             </Button>
           </div>
         </div>
