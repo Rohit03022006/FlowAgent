@@ -56,24 +56,39 @@ export async function POST(req: NextRequest) {
         handoffs: CreatedAgents,
     });
 
-    const result = await run(finalAgent,
-        input, {
-        conversationId: conversationId,
-        stream: true,
-    });
+    try {
+        const result = await run(finalAgent,
+            input, {
+            conversationId: conversationId,
+            stream: true,
+        });
 
-    const stream = result.toTextStream({
-        compatibleWithNodeStreams: true
+        const stream = result.toTextStream({
+            compatibleWithNodeStreams: true
 
-    });
+        });
 
-    // @ts-ignore
-    return new Response(stream);
+        // @ts-ignore
+        return new Response(stream);
+    } catch (error: any) {
+        console.error("Error in agent chat:", error);
+        return NextResponse.json(
+            { error: error.message || "Error processing chat request", details: error },
+            { status: error.status || 500 }
+        );
+    }
 }
 
 
-
 export async function GET(req: NextRequest) {
-    const { id: conversationId } = await openai.conversations.create({});
-    return NextResponse.json({ conversationId });
+    try {
+        const { id: conversationId } = await openai.conversations.create({});
+        return NextResponse.json({ conversationId });
+    } catch (error: any) {
+        console.error("Error creating conversation:", error);
+        return NextResponse.json(
+            { error: error.message || "Error creating conversation", details: error },
+            { status: error.status || 500 }
+        );
+    }
 }

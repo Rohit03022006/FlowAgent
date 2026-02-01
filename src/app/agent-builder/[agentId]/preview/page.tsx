@@ -13,6 +13,8 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Loader2Icon, Bot, Sparkles } from 'lucide-react';
 import ChatUi from './_components/ChatUi';
+import { toast } from 'sonner';
+import PublishCode from './_components/PublishCode';
 
 export default function PreviewPage() {
     const { agentId } = useParams();
@@ -20,6 +22,7 @@ export default function PreviewPage() {
     const [config, setConfig] = useState<any>();
     const convex = useConvex();
     const [agentDetails, setAgentDetails] = useState<any>();
+    const [openDialog, setOpenDialog] = useState(false);
     const [conversationId, setConversationId] = useState<string>("");
 
     const GetAgentDetails = async () => {
@@ -141,8 +144,18 @@ export default function PreviewPage() {
                 });
                 console.log("Database updated successfully");
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error generating agent tool config:", error);
+
+            if (error.response?.status === 429) {
+                toast.error("OpenAI Quota Exceeded", {
+                    description: "You've exceeded your current usage quota. Please check your billing details.",
+                });
+            } else {
+                toast.error("Generation Failed", {
+                    description: error.response?.data?.error || "Failed to generate agent configuration. Please try again.",
+                });
+            }
         } finally {
             setLoading(false);
         }
@@ -167,7 +180,7 @@ export default function PreviewPage() {
 
     return (
         <div className="flex flex-col h-screen w-screen overflow-hidden">
-            <Header previewHeader={true} agentDetails={agentDetails} />
+            <Header  openDialog={openDialog} setOpenDialog={setOpenDialog} previewHeader={true} agentDetails={agentDetails} />
             <div className="grid grid-cols-5 gap-1 h-full">
                 <div className="col-span-4 p-4 border rounded-2xl m-1 overflow-hidden">
                     <h2 className='text-lg font-semibold mb-2'>Preview</h2>
@@ -222,6 +235,7 @@ export default function PreviewPage() {
                     )}
                 </div>
             </div>
+            <PublishCode openDialog={openDialog} setOpenDialog={setOpenDialog} />
         </div>
     )
 }

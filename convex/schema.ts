@@ -21,6 +21,15 @@ export default defineSchema({
     agentToolConfig: v.optional(v.any()),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
-  })
-    .index("by_user", ["userId"]),
+  }).index("by_user", ["userId"]),
+
+
+  ConversationTable: defineTable({
+    conversationId: v.string(),
+    agentId: v.id("AgentTable"),
+    userId: v.id("UserTable"),
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+  }).index("by_agent", ["agentId"]).index("by_user", ["userId"]),
+
 });

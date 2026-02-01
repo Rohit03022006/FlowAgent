@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RefreshCw, Send, Bot, User, Sparkles, ShieldCheck, Zap, Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from 'sonner';
+import Markdown from 'react-markdown';
 
 type Prop = {
   GenerateAgentToolConfig: any;
@@ -96,8 +98,11 @@ export default function ChatUi({ GenerateAgentToolConfig, loading, agentDetails 
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
+      toast.error("Message Failed", {
+        description: "Failed to send message. Please try again.",
+      });
     } finally {
       setLoadingMessage(false);
     }
@@ -159,7 +164,7 @@ export default function ChatUi({ GenerateAgentToolConfig, loading, agentDetails 
                   ? 'bg-blue-600 text-white rounded-tr-none'
                   : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none'
                   }`}>
-                  {msg.content}
+                  <Markdown>{msg?.content}</Markdown>
                 </div>
                 <span className="text-[10px] text-slate-400 px-1 font-medium">
                   {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -189,7 +194,7 @@ export default function ChatUi({ GenerateAgentToolConfig, loading, agentDetails 
             <Button
               size="icon"
               onClick={handleSend}
-              disabled={!userInput.trim() || loading}
+              disabled={!userInput.trim().length || loading}
               className="h-10 w-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-100 transition-all hover:scale-105 active:scale-95"
             >
               {loadingMessage && <Loader2 className="w-4 h-4 animate-spin" />}

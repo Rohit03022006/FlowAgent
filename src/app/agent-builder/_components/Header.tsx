@@ -7,9 +7,10 @@ import Link from "next/link";
 type Props = {
     agentDetails: Agent | null;
     previewHeader?: boolean;
+    onPublish: () => void;  
 }
 
-const Header = ({ agentDetails, previewHeader = false }: Props) => {
+const Header = ({ agentDetails, previewHeader = false, onPublish }: Props) => {
     return (
         <div className="w-full p-2 flex justify-between items-center">
             <div className="flex items-center gap-4">
@@ -28,7 +29,7 @@ const Header = ({ agentDetails, previewHeader = false }: Props) => {
                 </Link> : <Link href={`/agent-builder/${agentDetails?._id}`}>
                     <Button variant={'outline'}> <X /> Close Preview</Button>
                 </Link>}
-                <Button> <Share /> Publish</Button>
+                <Button onClick={onPublish}> <Share /> Publish</Button>
             </div>
 
         </div>

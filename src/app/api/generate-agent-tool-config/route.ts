@@ -81,8 +81,8 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("Error generating agent tool config:", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
-      { status: 500 }
+      { error: error.message || "Internal Server Error", details: error },
+      { status: error.status || 500 }
     );
   }
 }
